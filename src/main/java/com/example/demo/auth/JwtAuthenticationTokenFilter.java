@@ -1,5 +1,6 @@
 package com.example.demo.auth;
 
+import com.example.demo.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -28,6 +29,9 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter implement
     private UserDetailsService userDetailsService;
 
     @Autowired
+    private AuthService authService;
+
+    @Autowired
     private JwtProvider jwtProvider;
 
     @SneakyThrows
@@ -37,9 +41,10 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter implement
                                     final @NonNull FilterChain chain) {
         final String authToken = request.getHeader("auth-token");
 
+
         final String username = jwtProvider.getUsernameFromToken(authToken);
         log.info("checking authentication for user " + username);
-        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+        if ((authToken != null) && authService.isTokenExist(authToken) && username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             try {
                 final UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
                 if (Boolean.TRUE.equals(jwtProvider.validateToken(authToken, userDetails))) {

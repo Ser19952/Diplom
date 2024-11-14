@@ -70,7 +70,8 @@ public class WebSecurityConfig {
                         .permitAll().
                         requestMatchers(HttpMethod.POST,
 
-                                "/api/auth/login"
+                                "/auth/login"
+
 
                         ).permitAll().
                         anyRequest().authenticated());
